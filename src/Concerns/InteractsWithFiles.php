@@ -1,6 +1,6 @@
 <?php
 
-namespace Phpacker\ComposerHooks\Concerns;
+namespace Phpacker\ComposerInstaller\Concerns;
 
 use Exception;
 
