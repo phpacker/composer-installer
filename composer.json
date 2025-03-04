@@ -1,0 +1,23 @@
+{
+    "name": "phpacker/composer-installer",
+    "description": "Install hooks to distribute your PHPacker cross-platform executables through composer",
+    "type": "composer-plugin",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Phpacker\\ComposerHooks\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "gwleuverink",
+            "email": "willem@leuver.ink"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {
+        "composer-plugin-api": "^2.2.2",
+        "composer/composer": "^2.2.2",
+        "symfony/finder": "^7.2"
+    }
+}
