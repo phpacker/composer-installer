@@ -1,11 +1,9 @@
 <?php
 
-namespace PHPacker\PHPacker;
+namespace PHPacker\ComposerInstaller;
 
-use Exception;
-use Phpacker\ComposerInstaller\Concerns\FindsConfigFile;
-use Symfony\Component\Finder\Finder;
-use Phpacker\ComposerInstaller\Concerns\InteractsWithFiles;
+use PHPacker\ComposerInstaller\Concerns\FindsConfigFile;
+use PHPacker\ComposerInstaller\Concerns\InteractsWithFiles;
 
 class Manager
 {
@@ -24,6 +22,14 @@ class Manager
         $config = self::readJsonFile($configPath);
 
         print_r($config);
+    }
+
+    public static function uninstall()
+    {
+        echo PHP_EOL;
+        echo 'UNINSTALL!';
+        echo PHP_EOL;
+        echo PHP_EOL;
     }
 
 }
