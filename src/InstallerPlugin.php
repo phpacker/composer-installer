@@ -33,7 +33,7 @@ class InstallerPlugin implements EventSubscriberInterface, PluginInterface
         $alias = $packageExtra['phpacker-install'] ?? false;
 
         if (is_string($alias)) {
-            Manager::install($alias);
+            Manager::install($alias, $this->io);
         }
     }
 
@@ -46,7 +46,7 @@ class InstallerPlugin implements EventSubscriberInterface, PluginInterface
         $alias = $packageExtra['phpacker-install'] ?? false;
 
         if (is_string($alias)) {
-            Manager::uninstall($alias);
+            Manager::uninstall($alias, $this->io);
         }
     }
 
