@@ -2,7 +2,8 @@
 
 namespace PHPacker\ComposerInstaller;
 
-// require_once __DIR__ . '/../vendor/autoload.php';
+$_composer_bin_dir ?? getcwd() . '/vendor/bin';
+require_once $_composer_bin_dir . '/autoload.php';
 
 use Composer\Composer;
 use Composer\IO\IOInterface;
