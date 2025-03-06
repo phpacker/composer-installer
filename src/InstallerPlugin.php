@@ -23,17 +23,21 @@ class InstallerPlugin implements EventSubscriberInterface, PluginInterface
         ];
     }
 
+    /*
+     * Detects if the package that has the Installer Plugin installed
+     * has a 'phpacker-install' value in composer.json extra section
+     */
     public function packageInstall(PackageEvent $event)
     {
 
         $package = $event->getOperation()->getPackage();
 
-        // $packageName = $package->getPrettyName();
+        $packageName = $package->getPrettyName();
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
 
         if (is_string($alias)) {
-            Manager::install($alias, $this->io);
+            Manager::install($packageName, $alias, $this->io);
         }
     }
 
