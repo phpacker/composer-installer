@@ -2,14 +2,17 @@
 
 namespace PHPacker\ComposerInstaller;
 
+require_once __DIR__ . '/../vendor/autoload.php';
+
 use Composer\Composer;
 use Composer\IO\IOInterface;
 use Composer\Installer\PackageEvent;
 use Composer\Plugin\PluginInterface;
-use PHPacker\ComposerInstaller\Manager;
 use Composer\EventDispatcher\EventSubscriberInterface;
 
-class InstallerPlugin implements PluginInterface, EventSubscriberInterface {
+class InstallerPlugin implements EventSubscriberInterface, PluginInterface
+{
+    protected IOInterface $io;
 
     public static function getSubscribedEvents()
     {
@@ -20,7 +23,8 @@ class InstallerPlugin implements PluginInterface, EventSubscriberInterface {
         ];
     }
 
-    public function packageInstall(PackageEvent $event) {
+    public function packageInstall(PackageEvent $event)
+    {
 
         $package = $event->getOperation()->getPackage();
 
@@ -28,24 +32,28 @@ class InstallerPlugin implements PluginInterface, EventSubscriberInterface {
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
 
-        if(is_string($alias)) {
+        if (is_string($alias)) {
             Manager::install($alias);
         }
     }
 
-    public function packageUninstall(PackageEvent $event) {
+    public function packageUninstall(PackageEvent $event)
+    {
+
         $package = $event->getOperation()->getPackage();
 
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
 
-        if(is_string($alias)) {
+        if (is_string($alias)) {
             Manager::uninstall($alias);
         }
     }
 
-
-    public function activate(Composer $composer, IOInterface $io) {}
+    public function activate(Composer $composer, IOInterface $io)
+    {
+        $this->io = $io;
+    }
 
     public function deactivate(Composer $composer, IOInterface $io) {}
 

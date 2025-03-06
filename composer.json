@@ -22,5 +22,8 @@
     "extra": {
         "class": "PHPacker\\ComposerInstaller\\InstallerPlugin"
     },
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "require-dev": {
+        "laravel/pint": "^1.21"
+    }
 }

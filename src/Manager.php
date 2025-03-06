@@ -7,9 +7,8 @@ use PHPacker\ComposerInstaller\Concerns\InteractsWithFiles;
 
 class Manager
 {
-
-    use InteractsWithFiles;
     use FindsConfigFile;
+    use InteractsWithFiles;
 
     public static function install()
     {
@@ -31,5 +30,4 @@ class Manager
         echo PHP_EOL;
         echo PHP_EOL;
     }
-
 }
