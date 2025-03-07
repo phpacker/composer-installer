@@ -12,17 +12,17 @@ class Manager extends LibraryInstaller implements InstallerInterface
 {
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        $awaitInstall = parent::install($repo, $package);
+        return parent::install($repo, $package)->then(function () use ($package) {
 
-        $packageExtra = $package->getExtra();
-        $alias = $packageExtra['phpacker-install'] ?? false;
-        $installPath = $this->getInstallPath($package);
+            $packageExtra = $package->getExtra();
+            $alias = $packageExtra['phpacker-install'] ?? false;
+            $installPath = $this->getInstallPath($package);
 
-        if ($alias) {
-            $this->installer()->installBinaries($package, $installPath);
-        }
+            if ($alias) {
+                $this->installer()->installBinaries($package, $installPath);
+            }
 
-        return $awaitInstall;
+        });
     }
 
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)

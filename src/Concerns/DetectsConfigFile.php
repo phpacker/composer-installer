@@ -12,7 +12,8 @@ trait DetectsConfigFile
         $finder->files()
             ->in($root)
             ->exclude(['vendor', 'tests'])
-            ->name('phpacker.json');
+            ->name('phpacker.json')
+            ->depth('<= 4');
 
         // If the package we're installing is phpacker itself, ignore it's internal config file.
         if (substr($root, -strlen('phpacker/phpacker')) === 'phpacker/phpacker') {
