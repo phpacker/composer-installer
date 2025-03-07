@@ -14,24 +14,29 @@ class Manager extends LibraryInstaller implements InstallerInterface
     {
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
+        $installPath = $this->getInstallPath($package);
 
         // phpacker-install alias found - override binaryInstaller
         if ($alias) {
-            $this->binaryInstaller = $this->installer();
-            parent::install($repo, $package);
+            $this->installer()->installBinaries($package, $installPath);
         }
+
+        return parent::install($repo, $package);
     }
 
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
     {
         $packageExtra = $target->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
+        $installPath = $this->getInstallPath($target);
 
-        // phpacker-install alias found - override binaryInstaller
+        // phpacker-install alias found
         if ($alias) {
-            $this->binaryInstaller = $this->installer();
-            parent::update($repo, $initial, $target);
+            $this->installer()->removeBinaries($initial);
+            $this->installer()->installBinaries($target, $installPath);
         }
+
+        return parent::update($repo, $initial, $target);
     }
 
     public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
@@ -39,11 +44,11 @@ class Manager extends LibraryInstaller implements InstallerInterface
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
 
-        // phpacker-install alias found - override binaryInstaller
         if ($alias) {
-            $this->binaryInstaller = $this->installer();
-            parent::uninstall($repo, $package);
+            $this->installer()->removeBinaries($package);
         }
+
+        return parent::uninstall($repo, $package);
     }
 
     protected function installer(): BinaryInstaller
