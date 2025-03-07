@@ -12,6 +12,8 @@ class Manager extends LibraryInstaller implements InstallerInterface
 {
     public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
+        $awaitInstall = parent::install($repo, $package);
+
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
         $installPath = $this->getInstallPath($package);
@@ -21,7 +23,7 @@ class Manager extends LibraryInstaller implements InstallerInterface
             $this->installer()->installBinaries($package, $installPath);
         }
 
-        return parent::install($repo, $package);
+        return $awaitInstall;
     }
 
     public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
