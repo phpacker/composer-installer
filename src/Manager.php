@@ -2,24 +2,63 @@
 
 namespace PHPacker\ComposerInstaller;
 
-use Composer\IO\IOInterface;
+use Composer\Package\PackageInterface;
+use Composer\Installer\LibraryInstaller;
+use Composer\Installer\InstallerInterface;
+use Composer\Repository\InstalledRepositoryInterface;
 use PHPacker\ComposerInstaller\Concerns\FindsConfigFile;
 use PHPacker\ComposerInstaller\Concerns\InteractsWithFiles;
 
-class Manager
+class Manager extends LibraryInstaller implements InstallerInterface
 {
     use FindsConfigFile;
     use InteractsWithFiles;
 
-    public static function install(string $package, string $alias, IOInterface $io)
+    public function install(InstalledRepositoryInterface $repo, PackageInterface $package)
     {
-        $binDir = self::binDir();
-        $installPath = $binDir . '/../' . $package;
-        $configPath = self::findConfig($installPath);
+        $this->installExecutable($package);
+    }
+
+    public function update(InstalledRepositoryInterface $repo, PackageInterface $initial, PackageInterface $target)
+    {
+        $this->installExecutable($target);
+    }
+
+    public function uninstall(InstalledRepositoryInterface $repo, PackageInterface $package)
+    {
+        $packageExtra = $package->getExtra();
+        $alias = $packageExtra['phpacker-install'] ?? false;
+
+        $binDir = $this->binDir();
+
+        [$platform, $arch] = self::detectPlatformAndArchitecture();
+
+        $executable = $binDir . '/' . $alias;
+        if ($platform === 'windows') {
+            $executable = $executable . '.exe';
+        }
+
+        if (! is_file($executable)) {
+            $this->io->warning("[PHPacker]: Uninstalling {$alias} - executable does not exist: '{$executable}'");
+
+            return;
+        }
+
+        unlink($executable);
+        $this->io->info("[PHPacker]: Uninstalled {$alias}");
+    }
+
+    protected function installExecutable(PackageInterface $package)
+    {
+        $packageExtra = $package->getExtra();
+        $alias = $packageExtra['phpacker-install'] ?? false;
+
+        $binDir = $this->binDir();
+        $configPath = self::findConfig($this->getInstallPath($package));
 
         // phpacker.json could not be discovered
         if (! $configPath) {
-            $io->error('[PHPacker]: Unable to discover phpacker.json file');
+            $this->io->error('[PHPacker]: Unable to discover phpacker.json file');
 
             return;
         }
@@ -29,7 +68,7 @@ class Manager
 
         // Configured src directory does not exist
         if (! is_dir($srcDir)) {
-            $io->error("[PHPacker]: Binary source directory does not exist: '{$srcDir}'");
+            $this->io->error("[PHPacker]: Binary source directory does not exist: '{$srcDir}'");
 
             return;
         }
@@ -43,7 +82,7 @@ class Manager
 
         // Executable could not be found
         if (! is_file($executable)) {
-            $io->error("[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}'");
+            $this->io->error("[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}'");
 
             return;
         }
@@ -58,28 +97,7 @@ class Manager
         copy($executable, $outputPath);
         chmod($outputPath, 0755); // chmod +x
 
-        $io->info("[PHPacker]: Installed {$alias} ({$platform}-{$arch}) '{$outputPath}'");
-    }
-
-    public static function uninstall(string $alias, IOInterface $io)
-    {
-        $binDir = self::binDir();
-
-        [$platform, $arch] = self::detectPlatformAndArchitecture();
-
-        $executable = $binDir . '/' . $alias;
-        if ($platform === 'windows') {
-            $executable = $executable . '.exe';
-        }
-
-        if (! is_file($executable)) {
-            $io->warning("[PHPacker]: Uninstalling {$alias} - executable does not exist: '{$executable}'");
-
-            return;
-        }
-
-        unlink($executable);
-        $io->info("[PHPacker]: Uninstalled {$alias}");
+        $this->io->info("[PHPacker]: Installed {$alias} ({$platform}-{$arch}) '{$outputPath}'");
     }
 
     protected static function detectPlatformAndArchitecture(): array
@@ -116,9 +134,8 @@ class Manager
         ];
     }
 
-    protected static function binDir(): string
+    protected function binDir(): string
     {
-        // As per composer docs. Only supported after v2.2
-        return $_composer_bin_dir ?? getcwd() . '/vendor/bin';
+        return rtrim($this->composer->getConfig()->get('bin-dir'), '/');
     }
 }
