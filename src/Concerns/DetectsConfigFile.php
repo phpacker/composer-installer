@@ -4,9 +4,9 @@ namespace PHPacker\ComposerInstaller\Concerns;
 
 use Symfony\Component\Finder\Finder;
 
-trait FindsConfigFile
+trait DetectsConfigFile
 {
-    private static function findConfig(string $root = __DIR__): ?string
+    private function detectConfig(string $root = __DIR__): ?string
     {
         $finder = new Finder;
         $finder->files()

@@ -7,13 +7,13 @@ use Composer\Util\Silencer;
 use Composer\Package\PackageInterface;
 use Composer\Installer\BinaryInstaller;
 use PHPacker\ComposerInstaller\Concerns\DetectsPlatform;
-use PHPacker\ComposerInstaller\Concerns\FindsConfigFile;
+use PHPacker\ComposerInstaller\Concerns\DetectsConfigFile;
 use PHPacker\ComposerInstaller\Concerns\InteractsWithFiles;
 
 class ExecutableInstaller extends BinaryInstaller
 {
+    use DetectsConfigFile;
     use DetectsPlatform;
-    use FindsConfigFile;
     use InteractsWithFiles;
 
     public function installBinaries(PackageInterface $package, string $installPath, bool $warnOnOverwrite = true): void
@@ -32,7 +32,7 @@ class ExecutableInstaller extends BinaryInstaller
 
         // Executable could not be found
         if (! is_file($executable)) {
-            $this->io->error("[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}'");
+            $this->io->error("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}'");
 
             return;
         }
@@ -41,13 +41,13 @@ class ExecutableInstaller extends BinaryInstaller
         Platform::workaroundFilesystemIssues();
 
         if (! file_exists($executable)) {
-            $this->io->writeError("    [PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': file not found in package</warning>");
+            $this->io->writeError("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': file not found in package</warning>");
 
             return;
         }
 
         if (is_dir($executable)) {
-            $this->io->writeError("    [PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': found a directory at that path</warning>");
+            $this->io->writeError("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': found a directory at that path</warning>");
 
             return;
         }
@@ -57,15 +57,18 @@ class ExecutableInstaller extends BinaryInstaller
             // $package, we can now safely turn it into a absolute path (as we
             // already checked the binary's existence). The following helpers
             // will require absolute paths to work properly.
-            $binPath = realpath($executable);
+            $executable = realpath($executable);
         }
 
         $this->initializeBinDir();
         $link = $this->binDir . '/' . $alias;
+
         if (file_exists($link)) {
+
             if (! is_link($link)) {
+
                 if ($warnOnOverwrite) {
-                    $this->io->writeError("    [PHPacker]: Skipped installation of bin '{$alias}' for package {$package->getName()}: name conflicts with an existing file");
+                    $this->io->writeError("    <warning>[PHPacker]: Skipped installation of bin '{$alias}' for package {$package->getName()}: name conflicts with an existing file");
                 }
 
                 return;
@@ -107,7 +110,8 @@ class ExecutableInstaller extends BinaryInstaller
         if (is_link($link) || file_exists($link)) { // still checking for symlinks here for legacy support
             $this->filesystem->unlink($link);
         }
-        if (is_file($link . '.bat')) {
+
+        if (is_file($link . '.exe')) {
             $this->filesystem->unlink($link . '.bat');
         }
 
@@ -119,11 +123,11 @@ class ExecutableInstaller extends BinaryInstaller
 
     public function getExecutable(string $installPath): ?string
     {
-        $configPath = self::findConfig($installPath);
+        $configPath = $this->detectConfig($installPath);
 
         // phpacker.json could not be discovered
         if (! $configPath) {
-            $this->io->writeError('    [PHPacker]: Unable to discover phpacker.json file');
+            $this->io->writeError('    <warning>[PHPacker]: Unable to discover phpacker.json file</warning>');
 
             return false;
         }
@@ -133,7 +137,7 @@ class ExecutableInstaller extends BinaryInstaller
 
         // Configured src directory does not exist
         if (! is_dir($srcDir)) {
-            $this->io->writeError("    [PHPacker]: Binary source directory does not exist: '{$srcDir}'");
+            $this->io->writeError("    <warning>[PHPacker]: Binary source directory does not exist: '{$srcDir}'</warning>");
 
             return false;
         }
