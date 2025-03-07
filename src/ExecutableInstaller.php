@@ -86,7 +86,7 @@ class ExecutableInstaller extends BinaryInstaller
         } else {
             $this->installUnixyProxyBinaries($executable, $link);
         }
-        Silencer::call('chmod', $binPath, 0777 & ~umask());
+        Silencer::call('chmod', $link, 0777 & ~umask());
 
     }
 
