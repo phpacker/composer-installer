@@ -44,13 +44,13 @@ class ExecutableInstaller extends BinaryInstaller
         if (! file_exists($executable)) {
             $this->io->writeError("    [PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': file not found in package</warning>");
 
-            continue;
+            return;
         }
 
         if (is_dir($executable)) {
             $this->io->writeError("    [PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': found a directory at that path</warning>");
 
-            continue;
+            return;
         }
 
         if (! $this->filesystem->isAbsolutePath($executable)) {
@@ -68,7 +68,7 @@ class ExecutableInstaller extends BinaryInstaller
                     $this->io->writeError("    [PHPacker]: Skipped installation of bin '{$alias}' for package {$package->getName()}: name conflicts with an existing file");
                 }
 
-                continue;
+                return;
             }
             if (realpath($link) === realpath($binPath)) {
                 // It is a linked binary from a previous installation, which can be replaced with a proxy file
