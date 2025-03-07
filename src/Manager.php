@@ -18,7 +18,6 @@ class Manager extends LibraryInstaller implements InstallerInterface
         $alias = $packageExtra['phpacker-install'] ?? false;
         $installPath = $this->getInstallPath($package);
 
-        // phpacker-install alias found - override binaryInstaller
         if ($alias) {
             $this->installer()->installBinaries($package, $installPath);
         }
