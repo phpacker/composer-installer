@@ -30,24 +30,17 @@ class ExecutableInstaller extends BinaryInstaller
 
         [$platform, $arch] = self::detectPlatformAndArchitecture();
 
-        // Executable could not be found
-        if (! is_file($executable)) {
-            $this->io->error("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}'");
-
-            return;
-        }
-
         // Override default behaviour
         Platform::workaroundFilesystemIssues();
 
         if (! file_exists($executable)) {
-            $this->io->writeError("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': file not found in package</warning>");
+            $this->io->writeError("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist - file not found in package '{$executable}'</warning>");
 
             return;
         }
 
         if (is_dir($executable)) {
-            $this->io->writeError("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': found a directory at that path</warning>");
+            $this->io->writeError("    <warning>[PHPacker]: executable {$platform}-{$arch} does not exist - found a directory at that path '{$executable}'</warning>");
 
             return;
         }
@@ -68,7 +61,7 @@ class ExecutableInstaller extends BinaryInstaller
             if (! is_link($link)) {
 
                 if ($warnOnOverwrite) {
-                    $this->io->writeError("    <warning>[PHPacker]: Skipped installation of bin '{$alias}' for package {$package->getName()}: name conflicts with an existing file");
+                    $this->io->writeError("    <warning>[PHPacker]: Skipped installation of bin '{$alias}' for package {$package->getName()} - name conflicts with an existing file");
                 }
 
                 return;
@@ -127,7 +120,7 @@ class ExecutableInstaller extends BinaryInstaller
 
         // phpacker.json could not be discovered
         if (! $configPath) {
-            $this->io->writeError('    <warning>[PHPacker]: Unable to discover phpacker.json file</warning>');
+            $this->io->writeError("    <warning>[PHPacker]: Unable to discover phpacker.json file in '{$installPath}'</warning>");
 
             return false;
         }
@@ -137,7 +130,7 @@ class ExecutableInstaller extends BinaryInstaller
 
         // Configured src directory does not exist
         if (! is_dir($srcDir)) {
-            $this->io->writeError("    <warning>[PHPacker]: Binary source directory does not exist: '{$srcDir}'</warning>");
+            $this->io->writeError("    <warning>[PHPacker]: Binary source directory does not exist in '{$srcDir}'</warning>");
 
             return false;
         }
