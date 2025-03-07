@@ -70,7 +70,7 @@ class ExecutableInstaller extends BinaryInstaller
 
                 return;
             }
-            if (realpath($link) === realpath($binPath)) {
+            if (realpath($link) === realpath($executable)) {
                 // It is a linked binary from a previous installation, which can be replaced with a proxy file
                 $this->filesystem->unlink($link);
             }
@@ -82,9 +82,9 @@ class ExecutableInstaller extends BinaryInstaller
         }
 
         if ($binCompat === 'full') {
-            $this->installFullBinaries($binPath, $link, $alias, $package);
+            $this->installFullBinaries($executable, $link, $alias, $package);
         } else {
-            $this->installUnixyProxyBinaries($binPath, $link);
+            $this->installUnixyProxyBinaries($executable, $link);
         }
         Silencer::call('chmod', $binPath, 0777 & ~umask());
 
