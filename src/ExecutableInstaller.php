@@ -19,6 +19,7 @@ class ExecutableInstaller extends BinaryInstaller
     public function installBinaries(PackageInterface $package, string $installPath, bool $warnOnOverwrite = true): void
     {
 
+        $this->io->writeError(1);
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
 
@@ -31,6 +32,7 @@ class ExecutableInstaller extends BinaryInstaller
 
         [$platform, $arch] = self::detectPlatformAndArchitecture();
 
+        $this->io->writeError(2);
         // Executable could not be found
         if (! is_file($executable)) {
             $this->io->error("[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}'");
@@ -40,6 +42,8 @@ class ExecutableInstaller extends BinaryInstaller
 
         // Override default behaviour
         Platform::workaroundFilesystemIssues();
+
+        $this->io->writeError(3);
 
         if (! file_exists($executable)) {
             $this->io->writeError("    [PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': file not found in package</warning>");
@@ -76,6 +80,8 @@ class ExecutableInstaller extends BinaryInstaller
             }
         }
 
+        $this->io->writeError(4);
+
         $binCompat = $this->binCompat;
         if ($binCompat === 'auto' && (Platform::isWindows() || Platform::isWindowsSubsystemForLinux())) {
             $binCompat = 'full';
@@ -86,6 +92,8 @@ class ExecutableInstaller extends BinaryInstaller
         } else {
             $this->installUnixyProxyBinaries($executable, $link);
         }
+
+        $this->io->writeError(5);
         Silencer::call('chmod', $link, 0777 & ~umask());
 
     }
@@ -122,7 +130,7 @@ class ExecutableInstaller extends BinaryInstaller
 
         // phpacker.json could not be discovered
         if (! $configPath) {
-            $this->io->error('[PHPacker]: Unable to discover phpacker.json file');
+            $this->io->writeError('    [PHPacker]: Unable to discover phpacker.json file');
 
             return false;
         }
@@ -132,7 +140,7 @@ class ExecutableInstaller extends BinaryInstaller
 
         // Configured src directory does not exist
         if (! is_dir($srcDir)) {
-            $this->io->error("[PHPacker]: Binary source directory does not exist: '{$srcDir}'");
+            $this->io->writeError("    [PHPacker]: Binary source directory does not exist: '{$srcDir}'");
 
             return false;
         }
