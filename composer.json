@@ -24,6 +24,7 @@
         "laravel/pint": "^1.21"
     },
     "extra": {
+        "bin-dir": "null",
         "class": "PHPacker\\ComposerInstaller\\InstallerPlugin"
     },
     "minimum-stability": "stable"
