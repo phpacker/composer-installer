@@ -53,6 +53,11 @@ class Manager extends LibraryInstaller implements InstallerInterface
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
 
+        // No phpacker-install alias found
+        if ($alias === false) {
+            return;
+        }
+
         $binDir = $this->binDir();
         $configPath = self::findConfig($this->getInstallPath($package));
 
