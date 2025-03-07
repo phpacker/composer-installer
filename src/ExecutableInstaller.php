@@ -18,8 +18,6 @@ class ExecutableInstaller extends BinaryInstaller
 
     public function installBinaries(PackageInterface $package, string $installPath, bool $warnOnOverwrite = true): void
     {
-
-        $this->io->writeError(1);
         $packageExtra = $package->getExtra();
         $alias = $packageExtra['phpacker-install'] ?? false;
 
@@ -32,7 +30,6 @@ class ExecutableInstaller extends BinaryInstaller
 
         [$platform, $arch] = self::detectPlatformAndArchitecture();
 
-        $this->io->writeError(2);
         // Executable could not be found
         if (! is_file($executable)) {
             $this->io->error("[PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}'");
@@ -42,8 +39,6 @@ class ExecutableInstaller extends BinaryInstaller
 
         // Override default behaviour
         Platform::workaroundFilesystemIssues();
-
-        $this->io->writeError(3);
 
         if (! file_exists($executable)) {
             $this->io->writeError("    [PHPacker]: executable {$platform}-{$arch} does not exist: '{$executable}': file not found in package</warning>");
@@ -64,6 +59,7 @@ class ExecutableInstaller extends BinaryInstaller
             // will require absolute paths to work properly.
             $binPath = realpath($executable);
         }
+
         $this->initializeBinDir();
         $link = $this->binDir . '/' . $alias;
         if (file_exists($link)) {
@@ -80,8 +76,6 @@ class ExecutableInstaller extends BinaryInstaller
             }
         }
 
-        $this->io->writeError(4);
-
         $binCompat = $this->binCompat;
         if ($binCompat === 'auto' && (Platform::isWindows() || Platform::isWindowsSubsystemForLinux())) {
             $binCompat = 'full';
@@ -93,7 +87,6 @@ class ExecutableInstaller extends BinaryInstaller
             $this->installUnixyProxyBinaries($executable, $link);
         }
 
-        $this->io->writeError(5);
         Silencer::call('chmod', $link, 0777 & ~umask());
 
     }
