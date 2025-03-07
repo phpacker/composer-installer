@@ -28,6 +28,11 @@ class ExecutableInstaller extends BinaryInstaller
 
         $executable = $this->getExecutable($installPath);
 
+        if (! $executable) {
+            // Something went wrong in getExecutabe. Warning already triggered there.
+            return;
+        }
+
         [$platform, $arch] = self::detectPlatformAndArchitecture();
 
         // Override default behaviour
